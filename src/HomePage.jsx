@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { getPosts, uploadPost } from './api';
 import { useState } from 'react';
 
@@ -15,8 +15,13 @@ function HomePage() {
     retry: 0,
   });
 
+  const queryClient = useQueryClient();
+
   const uploadPostMutation = useMutation({
     mutationFn: (newPost) => uploadPost(newPost),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['posts'] });
+    },
   });
 
   const handleInputChange = (e) => {
@@ -26,7 +31,11 @@ function HomePage() {
   const handleSubmit = (e) => {
     e.preventDefault();
     const newPost = { username: 'codeit', content };
-    uploadPostMutation.mutate(newPost);
+    uploadPostMutation.mutate(newPost, {
+      onSuccess: () => {
+        console.log('포스트가 성공적으로 업로드 되었습니다.');
+      },
+    });
     setContent('');
   };
 
@@ -40,7 +49,7 @@ function HomePage() {
       <div>
         <form onSubmit={handleSubmit}>
           <textarea name="content" value={content} onChange={handleInputChange} />
-          <button disabled={!content}>업로드</button>
+          <button disabled={uploadPostMutation.isPending || !content}>업로드</button>
         </form>
       </div>
       <div>
