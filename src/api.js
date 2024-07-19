@@ -7,5 +7,6 @@ export async function getPosts() {
 
 export async function getPostsByUsername(username) {
   const response = await fetch(`${BASE_URL}/posts?username=${username}`);
+  // throw new Error('error');
   return await response.json();
 }
