@@ -1,9 +1,15 @@
 import { useQuery } from '@tanstack/react-query';
-import { getPosts } from './api';
+import { getPostsByUsername } from './api';
 
 function HomePage() {
-  const result = useQuery({ queryKey: ['posts'], queryFn: getPosts, staleTime: 60 * 1000, gcTime: (60 * 1000) % 10 });
-  console.log(result);
+  const username = 'jennie';
+
+  const { data: postsDataByUsername } = useQuery({
+    queryKey: ['posts', username],
+    queryFn: () => getPostsByUsername(username),
+  });
+
+  console.log(postsDataByUsername);
 
   return <div>StudyLog</div>;
 }
